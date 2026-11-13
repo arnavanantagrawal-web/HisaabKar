@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HisaabKar - Fast & Fair Dinner Bill Splitter</title>
+  <link rel="stylesheet" href="ZC2026_style.css">
+</head>
+<body>
+  <div class="glow-bg"></div>
+
+  <div class="container">
+    <!-- Top Action Bar -->
+    <div class="top-nav">
+      <div class="brand-tag">
+        <span class="status-dot"></span>
+        <span>HisaabKar</span>
+      </div>
+      <button type="button" id="themeToggleBtn" class="btn-theme" title="Toggle Dark/Light Mode">
+        <span id="themeIcon">☀️</span>
+        <span id="themeText">Light</span>
+      </button>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <!-- Hand-drawn SVG Dining Table Illustration -->
+      <div class="dining-art">
+        <svg viewBox="0 0 320 90" class="art-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="160" cy="62" rx="55" ry="18" fill="var(--bg-card-subtle)" stroke="var(--border-color)" stroke-width="2" />
+          <ellipse cx="160" cy="60" rx="38" ry="12" fill="var(--bg-input)" stroke="var(--border-color)" stroke-width="1.5" />
+          <path d="M 125 58 C 125 32, 195 32, 195 58 Z" fill="var(--cloche-fill)" stroke="var(--accent-amber)" stroke-width="2" />
+          <circle cx="160" cy="30" r="4" fill="var(--accent-amber)" />
+          <path d="M 90 40 L 90 70 M 86 40 L 86 52 Q 90 56 94 52 L 94 40" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" />
+          <path d="M 230 40 Q 227 54 230 70 M 228 40 Q 235 45 230 52" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" />
+          <path d="M 50 52 Q 47 44 50 38 Q 53 44 50 52 Z" fill="var(--accent-amber)" />
+          <rect x="48" y="52" width="4" height="18" rx="1.5" fill="var(--text-muted)" />
+          <path d="M 268 42 Q 268 56 274 58 L 274 70 M 270 70 L 278 70" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M 269 48 Q 274 50 279 48" fill="#f43f5e" opacity="0.8" />
+        </svg>
+      </div>
+
+      <div class="header-badge">🍽️ ZERO-DRAMA DINNER SETTLEMENT</div>
+      <div class="logo-row">
+        <span class="logo-icon">🥘</span>
+        <h1 class="logo-title">Hisaab<span class="highlight">Kar</span></h1>
+      </div>
+      <p class="subtitle">Because good friendships shouldn't end at dessert. Settle up fast with exact zero-rounding math.</p>
+      
+      <div id="reloadIndicator" class="reload-badge hidden">
+        <span>🔄 Saved data restored across reload</span>
+        <button id="clearBtn" type="button" class="btn-text">Reset All</button>
+      </div>
+    </header>
+
+    <!-- Main Card -->
+    <main class="card">
+      <form id="splitterForm" novalidate>
+        <!-- 1. Occasion Name -->
+        <div class="form-group">
+          <label for="occasionInput">Occasion / Restaurant Name</label>
+          <input 
+            type="text" 
+            id="occasionInput" 
+            placeholder="e.g. Olive Bistro Friday Dinner" 
+            autocomplete="off"
+          />
+          <div class="chips-row">
+            <span class="chip-label">Quick:</span>
+            <button type="button" class="chip" data-val="Dinner with Homies">Dinner with Homies</button>
+            <button type="button" class="chip" data-val="Pizza & Drinks Night">Pizza & Drinks</button>
+            <button type="button" class="chip" data-val="Late Night Buffet">Late Night Buffet</button>
+          </div>
+        </div>
+
+        <!-- Currency & Decimals Mode -->
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="currencySelect">Currency</label>
+            <select id="currencySelect">
+              <option value="₹" data-decimals="0" data-code="INR" selected>🇮🇳 ₹ INR (India - Whole Rupees)</option>
+              <option value="$" data-decimals="2" data-code="USD">🇺🇸 $ USD (USA - Cents)</option>
+              <option value="€" data-decimals="2" data-code="EUR">🇪🇺 € EUR (Eurozone)</option>
+              <option value="£" data-decimals="2" data-code="GBP">🇬🇧 £ GBP (UK Pounds)</option>
+              <option value="د.إ" data-decimals="2" data-code="AED">🇦🇪 د.إ AED (UAE Dirham)</option>
+              <option value="¥" data-decimals="0" data-code="JPY">🇯🇵 ¥ JPY (Japan - No Decimals)</option>
+              <option value="CA$" data-decimals="2" data-code="CAD">🇨🇦 CA$ CAD (Canada)</option>
+            </select>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="decimalModeSelect">Split Mode</label>
+            <select id="decimalModeSelect">
+              <option value="0" selected>Whole Rupees (0 Decimals / UPI Style)</option>
+              <option value="2">Standard 2 Decimals (With Cents)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 2. Bill Amount -->
+        <div class="form-group">
+          <label for="billInput">
+            Total Bill Amount (<span id="currencySymbolLabel">₹</span>) <span class="required">*</span>
+          </label>
+          <div class="input-with-prefix">
+            <span id="billPrefix" class="prefix">₹</span>
+            <input 
+              type="number" 
+              id="billInput" 
+              step="any" 
+              placeholder="0" 
+              required
+            />
+          </div>
+          <div id="billError" class="error-msg hidden"></div>
+
+          <!-- Tip / Service Charge Selector (Supports >20% & Custom!) -->
+          <div class="tip-section">
+            <div class="tip-header">
+              <span>Add Tip / Service Charge:</span>
+              <strong id="activeTipLabel" class="tip-value">0%</strong>
+            </div>
+            <div class="tip-buttons">
+              <button type="button" class="tip-btn active" data-tip="0">0%</button>
+              <button type="button" class="tip-btn" data-tip="5">5%</button>
+              <button type="button" class="tip-btn" data-tip="10">10%</button>
+              <button type="button" class="tip-btn" data-tip="15">15%</button>
+              <button type="button" class="tip-btn" data-tip="20">20%</button>
+              <button type="button" class="tip-btn" data-tip="25">25%</button>
+              <button type="button" class="tip-btn" data-tip="30">30%</button>
+              <button type="button" id="customTipBtn" class="tip-btn">Custom %</button>
+            </div>
+            <div id="customTipRow" class="custom-tip-row hidden">
+              <input type="number" id="customTipInput" min="0" max="200" placeholder="e.g. 35" />
+              <span>%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Number of People -->
+        <div class="form-group">
+          <label for="peopleInput">
+            Number of Friends Sharing <span class="required">*</span>
+          </label>
+          <div class="stepper-row">
+            <input 
+              type="number" 
+              id="peopleInput" 
+              min="1" 
+              step="1" 
+              placeholder="e.g. 4" 
+              required
+            />
+            <button type="button" id="minusBtn" class="btn-step" title="Minus 1">-</button>
+            <button type="button" id="plusBtn" class="btn-step" title="Plus 1">+</button>
+          </div>
+          <div id="peopleError" class="error-msg hidden"></div>
+        </div>
+
+        <!-- General Error Banner -->
+        <div id="generalAlert" class="alert alert-error hidden"></div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="calculateBtn" class="btn btn-primary">
+          <span>Show What Each Person Pays</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </form>
+
+      <!-- Results Section -->
+      <section id="resultsSection" class="results hidden">
+        <hr class="divider" />
+        
+        <div class="results-header">
+          <div>
+            <div class="res-sub">HISAAB SUMMARY</div>
+            <h2 id="resultOccasion">Occasion</h2>
+          </div>
+          <span class="badge badge-success">✓ Zero Rounding Loss</span>
+        </div>
+
+        <!-- Hero Metric -->
+        <div class="hero-metric">
+          <div class="metric-label" id="metricLabel">Each Person Pays (Base)</div>
+          <div class="metric-value" id="eachPaysVal">₹0</div>
+          <div class="metric-note" id="remainderExplanation"></div>
+        </div>
+
+        <!-- Exact Math Proof Box -->
+        <div class="proof-card">
+          <div class="proof-title">
+            <strong>Exact Mathematical Sum Proof:</strong>
+          </div>
+          <div class="proof-formula" id="proofFormula"></div>
+          <div class="proof-status" id="proofStatus">
+            <span class="icon-check">✓</span> 
+            Sum of all shares matches the bill: 
+            <strong id="proofTotal">₹0</strong> (Discrepancy: 0)
+          </div>
+        </div>
+
+        <!-- Friends List -->
+        <div class="friends-header">
+          <h3>Individual Share Breakdown</h3>
+          <span class="hint-text">Check off friends as they pay</span>
+        </div>
+        <div id="peopleList" class="people-grid"></div>
+
+        <!-- Actions -->
+        <div class="actions-row">
+          <button type="button" id="copySummaryBtn" class="btn btn-secondary">
+            📋 Copy WhatsApp Settlement Note
+          </button>
+          <button type="button" id="resetFormBtn" class="btn btn-outline">
+            Reset & New Bill
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>HisaabKar • IIT Bombay Techfest ZeroCode Pure Vanilla Implementation</p>
+    </footer>
+  </div>
+
+  <script src="ZC2026_script.js"></script>
+</body>
+</html>
